@@ -1,0 +1,28 @@
+# Python & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Ambientes Virtuais
+venv/
+env/
+ENV/
+.env
+
+# Banco de dados SQLite local
+*.sqlite3
+db.sqlite3
+
+# Logs e arquivos temporários
+*.log
+*.pot
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+
+# Arquivos locais — não commitar
+*.txt
+!requirements.txt

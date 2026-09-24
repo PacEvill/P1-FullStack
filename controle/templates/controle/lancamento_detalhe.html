@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalhe do Lançamento{% endblock %}
+
+{% block content %}
+<div style="max-width: 700px; margin: 0 auto;">
+    <div class="page-header">
+        <div class="page-title">
+            <h1>Detalhes do Lançamento</h1>
+            <p>Identificador #{{ lancamento.id }}</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+            <a href="{% url 'editar_lancamento' lancamento.pk %}" class="btn btn-secondary">Editar</a>
+            <a href="{% url 'lista_lancamentos' %}" class="btn btn-primary">Voltar à Lista</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1.2rem; margin-bottom: 1.2rem;">
+            <div>
+                <h2 style="font-size: 1.4rem;">{{ lancamento.descricao }}</h2>
+                <span class="badge {% if lancamento.categoria.tipo == 'RECEITA' %}badge-receita{% else %}badge-despesa{% endif %}" style="margin-top: 0.4rem;">
+                    {{ lancamento.categoria.nome }}
+                </span>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 1.8rem; font-weight: 700; color: {% if lancamento.tipo == 'RECEITA' %}var(--success){% else %}var(--danger){% endif %};">
+                    {% if lancamento.tipo == 'RECEITA' %}+{% else %}-{% endif %} R$ {{ lancamento.valor }}
+                </div>
+                <span class="badge {% if lancamento.status == 'CONCLUIDO' %}badge-concluido{% else %}badge-pendente{% endif %}">
+                    {{ lancamento.get_status_display }}
+                </span>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem;">
+            <div>
+                <strong style="color: var(--text-muted); font-size: 0.85rem; display: block;">Data de Competência</strong>
+                <span style="font-size: 1.05rem;">{{ lancamento.data|date:"d/m/Y" }}</span>
+            </div>
+            <div>
+                <strong style="color: var(--text-muted); font-size: 0.85rem; display: block;">Conta Vinculada</strong>
+                <span style="font-size: 1.05rem;">{{ lancamento.conta.nome }} ({{ lancamento.conta.get_tipo_display }})</span>
+            </div>
+            <div>
+                <strong style="color: var(--text-muted); font-size: 0.85rem; display: block;">Tipo de Operação</strong>
+                <span style="font-size: 1.05rem;">{{ lancamento.get_tipo_display }}</span>
+            </div>
+            <div>
+                <strong style="color: var(--text-muted); font-size: 0.85rem; display: block;">Criado em</strong>
+                <span style="font-size: 1.05rem;">{{ lancamento.criado_em|date:"d/m/Y H:i" }}</span>
+            </div>
+        </div>
+
+        {% if lancamento.observacoes %}
+            <div style="border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                <strong style="color: var(--text-muted); font-size: 0.85rem; display: block; margin-bottom: 0.3rem;">Observações</strong>
+                <p style="white-space: pre-wrap; line-height: 1.5;">{{ lancamento.observacoes }}</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

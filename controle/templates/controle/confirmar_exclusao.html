@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmar Exclusão{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 2rem auto;">
+    <div class="card" style="text-align: center; border-color: var(--danger-light);">
+        <div style="font-size: 2.5rem; margin-bottom: 0.8rem;">⚠️</div>
+        <h2 style="color: var(--danger); margin-bottom: 0.8rem;">Confirmar Exclusão</h2>
+        <p style="color: var(--text-main); margin-bottom: 1rem;">
+            Tem certeza de que deseja excluir o(a) <strong>{{ tipo_objeto }}</strong>:
+        </p>
+        <div style="background-color: var(--bg-elevated); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; font-weight: 600;">
+            {{ objeto }}
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
+            Esta ação é irreversível e removerá permanentemente o registro da base de dados.
+        </p>
+
+        <form method="post" style="display: flex; gap: 1rem; justify-content: center;">
+            {% csrf_token %}
+            <a href="{% url url_cancelar %}" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-danger">Sim, Excluir</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

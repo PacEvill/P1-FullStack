@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 650px; margin: 0 auto;">
+    <div class="card">
+        <div style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+            <h2>{{ titulo }}</h2>
+            {% if subtitulo %}
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.2rem;">{{ subtitulo }}</p>
+            {% endif %}
+        </div>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger" style="margin-bottom: 1.2rem;">
+                    {% for error in form.non_field_errors %}
+                        <div>⚠️ {{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                        {% if field.field.required %}<span style="color: var(--danger);">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small style="color: var(--text-muted); font-size: 0.8rem; display: block; margin-top: 0.2rem;">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                            <div class="field-error">❌ {{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <div style="display: flex; gap: 0.8rem; justify-content: flex-end; margin-top: 1.8rem; border-top: 1px solid var(--border-color); padding-top: 1.2rem;">
+                <a href="javascript:history.back()" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">{{ btn_texto|default:"Salvar" }}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
