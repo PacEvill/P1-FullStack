@@ -9,10 +9,54 @@
         <p>Visão geral de todas as receitas e despesas registradas</p>
     </div>
     <div>
-        <a href="{% url 'novo_lancamento' %}" class="btn btn-primary">
-            + Novo Lançamento
-        </a>
+        <a href="{% url 'novo_lancamento' %}" class="btn btn-primary">+ Novo Lançamento</a>
     </div>
+</div>
+
+{# ============================================================ #}
+{# FEATURE 1 (P1): Busca textual + Filtro por categoria        #}
+{# Os dois filtros operam juntos via Q() na mesma listagem      #}
+{# ============================================================ #}
+<div class="card" style="margin-bottom: 1.2rem;">
+    <form method="get" action="{% url 'lista_lancamentos' %}" style="display: flex; gap: 0.8rem; align-items: flex-end; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 220px;">
+            <label for="id_busca" style="font-size: 0.85rem; margin-bottom: 0.3rem; display: block;">Buscar por descrição</label>
+            <input
+                type="text"
+                id="id_busca"
+                name="q"
+                class="form-control"
+                placeholder="Digite uma palavra-chave..."
+                value="{{ request.GET.q }}"
+                autocomplete="off"
+            >
+        </div>
+        <div style="flex: 1; min-width: 180px;">
+            <label for="id_categoria" style="font-size: 0.85rem; margin-bottom: 0.3rem; display: block;">Filtrar por categoria</label>
+            <select id="id_categoria" name="categoria" class="form-select">
+                <option value="">— Todas as Categorias —</option>
+                {% for cat in categorias %}
+                    <option value="{{ cat.id }}" {% if categoria_id == cat.id|stringformat:"s" %}selected{% endif %}>
+                        {{ cat.nome }} ({{ cat.get_tipo_display }})
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+            <button type="submit" class="btn btn-primary">Buscar / Filtrar</button>
+            {% if q or categoria_id %}
+                <a href="{% url 'lista_lancamentos' %}" class="btn btn-secondary" title="Limpar filtros">✕ Limpar</a>
+            {% endif %}
+        </div>
+    </form>
+
+    {% if q or categoria_id %}
+        <div style="margin-top: 0.8rem; font-size: 0.88rem; color: var(--text-muted);">
+            Exibindo <strong>{{ lancamentos|length }}</strong> resultado(s)
+            {% if q %} para a busca <em>"{{ q }}"</em>{% endif %}
+            {% if categoria_id %} na categoria selecionada{% endif %}.
+        </div>
+    {% endif %}
 </div>
 
 <div class="card">
@@ -36,7 +80,7 @@
                         <td>
                             <strong>{{ lancamento.descricao }}</strong>
                             {% if lancamento.observacoes %}
-                                <div style="font-size: 0.8rem; color: var(--text-muted);">{{ lancamento.observacoes|truncatechars:40 }}</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">{{ lancamento.observacoes|truncatechars:45 }}</div>
                             {% endif %}
                         </td>
                         <td>
@@ -51,20 +95,25 @@
                             </span>
                         </td>
                         <td style="font-weight: 700; color: {% if lancamento.tipo == 'RECEITA' %}var(--success){% else %}var(--danger){% endif %};">
-                            {% if lancamento.tipo == 'RECEITA' %}+{% else %}-{% endif %} R$ {{ lancamento.valor }}
+                            {% if lancamento.tipo == 'RECEITA' %}+{% else %}-{% endif %} R$&nbsp;{{ lancamento.valor }}
                         </td>
                         <td style="text-align: right; white-space: nowrap;">
-                            <a href="{% url 'detalhe_lancamento' lancamento.pk %}" class="btn btn-secondary btn-sm" title="Detalhes">Ver</a>
-                            <a href="{% url 'editar_lancamento' lancamento.pk %}" class="btn btn-secondary btn-sm" title="Editar">Editar</a>
-                            <a href="{% url 'excluir_lancamento' lancamento.pk %}" class="btn btn-danger btn-sm" title="Excluir">Excluir</a>
+                            <a href="{% url 'detalhe_lancamento' lancamento.pk %}" class="btn btn-secondary btn-sm">Ver</a>
+                            <a href="{% url 'editar_lancamento' lancamento.pk %}" class="btn btn-secondary btn-sm">Editar</a>
+                            <a href="{% url 'excluir_lancamento' lancamento.pk %}" class="btn btn-danger btn-sm">Excluir</a>
                         </td>
                     </tr>
                 {% empty %}
                     <tr>
                         <td colspan="7">
                             <div class="empty-state">
-                                <h3>Nenhum lançamento encontrado</h3>
-                                <p>Comece adicionando seu primeiro lançamento financeiro no botão acima.</p>
+                                {% if q or categoria_id %}
+                                    <h3>Nenhum resultado encontrado</h3>
+                                    <p>Tente outros termos de busca ou remova o filtro de categoria.</p>
+                                {% else %}
+                                    <h3>Nenhum lançamento cadastrado</h3>
+                                    <p>Comece adicionando seu primeiro lançamento financeiro.</p>
+                                {% endif %}
                             </div>
                         </td>
                     </tr>

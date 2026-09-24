@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.db.models import Q
 from .models import Conta, Categoria, Lancamento
 from .forms import ContaForm, CategoriaForm, LancamentoForm
 
@@ -11,10 +12,31 @@ from .forms import ContaForm, CategoriaForm, LancamentoForm
 def lista_lancamentos(request):
     """
     Listagem principal de lançamentos financeiros (CRUD existente - Aula 05).
+
+    Feature 1 (P1): Busca textual por descrição e filtro relacional por
+    categoria, combinados via objetos Q() do ORM do Django.
+    Ambos os filtros operam simultaneamente na mesma queryset/tabela.
     """
     lancamentos = Lancamento.objects.all().select_related('conta', 'categoria')
+    categorias = Categoria.objects.all()
+
+    # --- Feature 1: Busca textual por descrição ---
+    q = request.GET.get('q', '').strip()
+    if q:
+        lancamentos = lancamentos.filter(
+            Q(descricao__icontains=q) | Q(observacoes__icontains=q)
+        )
+
+    # --- Feature 1: Filtro relacional por categoria ---
+    categoria_id = request.GET.get('categoria', '').strip()
+    if categoria_id:
+        lancamentos = lancamentos.filter(categoria__id=categoria_id)
+
     return render(request, 'controle/lancamentos_lista.html', {
         'lancamentos': lancamentos,
+        'categorias': categorias,
+        'q': q,
+        'categoria_id': categoria_id,
     })
 
 
